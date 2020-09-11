@@ -7,47 +7,54 @@ close all
 
 %% Proposta de solucao
 
-iterations=9
+itertations=7;
+display(['Iterations: ', num2str(itertations)])
+fprintf('\n%11s%11s%11s%11s%11s%11s%11s\n','N IF', 'max u', 'max du/dx', 'L2 u', 'L2 du/dx', 'Eng u', 'Eng du/dx');
 
-
-
-for i=1:iterations
+for i=1:itertations
     
     
     [erronormamaxu(i), erronormaL2u(i), erronormaenergiau(i),erronormamaxdu(i), erronormaL2du(i), erronormaenergiadu(i)]=galerkinsol(i, false);
     
+
+    x = rand(5,1);
+    y = rand(5,1);
+    [r,t] = cart2pol(x,y);
+    fprintf('%10.0f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n',[i, erronormamaxu(i),erronormamaxdu(i),erronormaL2u(i),erronormaL2du(i),erronormaenergiau(i),erronormaenergiadu(i)].');
+
     if i==1
         figure;
     end
-    plot(1:i,erronormamaxu,'-r');
+    plot(1:i,erronormamaxu,'color','#0072BD');
     hold on;
-    plot(1:i,erronormaL2u,'-b');
-    plot(1:i,erronormaenergiau,'-g');
+    plot(1:i,erronormaL2u,'color','#D95319');
+    plot(1:i,erronormaenergiau,'color','#EDB120');
     
-    plot(1:i,erronormamaxdu,'-y');
+    plot(1:i,erronormamaxdu,'color','#7E2F8E');
     hold on;
-    plot(1:i,erronormaL2du,'-o');
-    plot(1:i,erronormaenergiadu,'-p');
+    plot(1:i,erronormaL2du,'color','#A2142F');
+    plot(1:i,erronormaenergiadu,'color','#77AC30');
     legend('Norma max - u(x)','Norma L2 - u(x)','Norma Energia - u(x)','Norma max - du(x)/dx','Norma L2 - du(x)/dx','Norma Energia - du(x)/dx' )
     title('Erro vs iteracoes u(x)')
     drawnow;
     
 end
 
-N=1:iterations;
+    
+N=1:itertations;
 
 figure;
-plot(N,erronormamaxu,'-r');
+plot(N,erronormamaxu,'color','#0072BD');
 legend('Norma max')
 title('Erro vs iteracoes - Norma max - u(x)')
 
 figure;
-plot(N,erronormaL2u,'-b');
+plot(N,erronormaL2u,'color','#D95319');
 legend('Norma L2')
 title('Erro vs iteracoes - Norma L2 - u(x)')
 
 figure;
-plot(N,erronormaenergiau,'-g');
+plot(N,erronormaenergiau,'color','#EDB120');
 legend('Norma Energia')
 title('Erro vs iteracoes - Norma Energia - u(x)')
 
@@ -64,8 +71,12 @@ title('Erro vs iteracoes - Norma L2 - du(x)/dx')
 figure;
 plot(N,erronormaenergiadu,'-p');
 legend('Norma Energia')
-title('Erro vs iteracoes - Norma Energia - du(x)/dx')
 
+
+
+
+
+%% Definição de funções
 
 function [erronormamaxu,erronormaL2u, erronormaenergiau,erronormamaxdu, erronormaL2du, erronormaenergiadu]=galerkinsol(n,showplots)
 
@@ -73,14 +84,12 @@ function [erronormamaxu,erronormaL2u, erronormaenergiau,erronormamaxdu, erronorm
     f = a*x^3;   %Função f(x)
     limsup=1;    %Limite superior do intervalo
 
-
-    display(['Dimensão: ', num2str(n)])
-
     %Funções Ni (e suas derivadas dNi) usadas na aproximação de vh
     for i=1:n
         N(i) = 1-x^i;
         dN(i) = diff(N(i),x);
     end
+    
     %Funções Nnj (e suas derivadas dNnj) usadas na aproximação de gh
     Nn1 = x;
     dNn1 = diff(Nn1,x);
@@ -139,24 +148,24 @@ function [erronormamaxu,erronormaL2u, erronormaenergiau,erronormamaxdu, erronorm
     Arrayuh=eval(uh);
     variationu=abs(Arrayu-Arrayuh);
     [maxdifu,posu]=max(variationu);
-    erronormamaxu=(maxdifu/(Arrayu(posu)));
+    erronormamaxu=(maxdifu/abs(Arrayu(posu)));
     
     Arraydu=eval(du);
     Arrayduh=eval(duh);
     variationdu=abs(Arraydu-Arrayduh);
     [maxdifdu,posdu]=max(variationdu);
-    erronormamaxdu=(maxdifdu/(Arraydu(posdu)));
+    erronormamaxdu=(maxdifdu/abs(Arraydu(posdu)));
 
     %Calculo pela norma L2
 
     syms x;
-    erronormaL2u=double(int(eval((u-uh)^2),x,0,limsup)/(int(eval(u^2),x,0,limsup)));
-    erronormaL2du=double(int(eval((du-duh)^2),x,0,limsup)/(int(eval(du^2),x,0,limsup)));
+    
+    erronormaL2u=double(sqrt(int(eval((u-uh)^2),x,0,limsup)/(int(eval(u^2),x,0,limsup))));
+    erronormaL2du=double(sqrt(int(eval((du-duh)^2),x,0,limsup)/(int(eval(du^2),x,0,limsup))));
 
     %Calculo pela norma do Energia
     k=1;
     c=0;
-    
     numerator=sqrt(0.5*int(eval(k*diff(u-uh,x)^2+c*(u-uh)^2),x,0,limsup));
     denominator=sqrt(0.5*int(eval(k*diff(u,x)^2+c*u^2),x,0,limsup));
     erronormaenergiau=double(numerator/denominator);
@@ -215,5 +224,4 @@ function [erronormamaxu,erronormaL2u, erronormaenergiau,erronormamaxdu, erronorm
     end
 
 end
-
 
