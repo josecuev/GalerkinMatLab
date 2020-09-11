@@ -7,7 +7,7 @@ close all
 
 %% Proposta de solucao
 
-itertations=7;
+itertations=10;
 display(['Iterations: ', num2str(itertations)])
 fprintf('\n%11s%11s%11s%11s%11s%11s%11s\n','N IF', 'max u', 'max du/dx', 'L2 u', 'L2 du/dx', 'Eng u', 'Eng du/dx');
 
@@ -22,57 +22,25 @@ for i=1:itertations
     [r,t] = cart2pol(x,y);
     fprintf('%10.0f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n',[i, erronormamaxu(i),erronormamaxdu(i),erronormaL2u(i),erronormaL2du(i),erronormaenergiau(i),erronormaenergiadu(i)].');
 
-    if i==1
-        figure;
-    end
+    figure(1)
     plot(1:i,erronormamaxu,'color','#0072BD');
     hold on;
     plot(1:i,erronormaL2u,'color','#D95319');
     plot(1:i,erronormaenergiau,'color','#EDB120');
+    legend('Norma max','Norma L2 ','Norma Energia' )
+    title('Erro vs número de funções de interpolação - u(x)')
+
     
-    plot(1:i,erronormamaxdu,'color','#7E2F8E');
+    figure(2);
+    plot(1:i,erronormamaxdu,'color','#0072BD');
     hold on;
-    plot(1:i,erronormaL2du,'color','#A2142F');
-    plot(1:i,erronormaenergiadu,'color','#77AC30');
-    legend('Norma max - u(x)','Norma L2 - u(x)','Norma Energia - u(x)','Norma max - du(x)/dx','Norma L2 - du(x)/dx','Norma Energia - du(x)/dx' )
-    title('Erro vs iteracoes u(x)')
+    plot(1:i,erronormaL2du,'color','#D95319');
+    plot(1:i,erronormaenergiadu,'color','#EDB120');
+    legend('Norma max','Norma L2 ','Norma Energia' )
+    title('Erro vs número de funções de interpolação - du(x)/dx')
     drawnow;
     
 end
-
-    
-N=1:itertations;
-
-figure;
-plot(N,erronormamaxu,'color','#0072BD');
-legend('Norma max')
-title('Erro vs iteracoes - Norma max - u(x)')
-
-figure;
-plot(N,erronormaL2u,'color','#D95319');
-legend('Norma L2')
-title('Erro vs iteracoes - Norma L2 - u(x)')
-
-figure;
-plot(N,erronormaenergiau,'color','#EDB120');
-legend('Norma Energia')
-title('Erro vs iteracoes - Norma Energia - u(x)')
-
-figure;
-plot(N,erronormamaxdu,'-y');
-legend('Norma max')
-title('Erro vs iteracoes - Norma max - du(x)/dx')
-
-figure;
-plot(N,erronormaL2du,'-o');
-legend('Norma L2')
-title('Erro vs iteracoes - Norma L2 - du(x)/dx')
-
-figure;
-plot(N,erronormaenergiadu,'-p');
-legend('Norma Energia')
-
-
 
 
 
